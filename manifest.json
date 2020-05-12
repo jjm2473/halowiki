@@ -1,7 +1,7 @@
 {
-  "name": "Halo Word Dictionary",
-  "short_name": "Halo Word",
-  "version": "0.6.12",
+  "name": "Fork Halo Word Dictionary",
+  "short_name": "Fork Halo Word",
+  "version": "0.0.1",
   "manifest_version": 2,
 
   "description": "精巧易用的英汉字典，界面简洁舒适。包含单词表、划词查询、右键查询等功能。Enjoy!",
@@ -29,10 +29,8 @@
     "all_frames": true
   } ],
   "minimum_chrome_version": "20",
-  "omnibox": { "keyword" : "halo" },
   "permissions": [
     "<all_urls>",
-    "unlimitedStorage",
     "storage",
     "contextMenus",
     "tabs"
