@@ -1,9 +1,9 @@
 #haloword-lookup {
 	display: none;
-	position: absolute;
+	position: fixed;
 	border: 2px solid #95CBF9;
 	padding: 3px 3px 5px 3px;
-	width: 260px;
+	width: 400px;
 	font-family: "Helvetica Neue", Helvetica, "Liberation Sans", Arial, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
 
 	/* avoid affections */
@@ -28,7 +28,7 @@
 	cursor: move;
 
 	/* avoid affections */
-	width: 252px;
+	/*width: 252px;*/
 }
 #haloword-word {
 	float: left;
@@ -54,7 +54,7 @@
 #haloword-content {
 	padding: 4px 6px 0 6px;
 	margin: 2px 2px 0 0;
-	max-height: 200px;
+	max-height: 400px;
 	overflow: auto;
 	color: #000;
 	font-size: 13px;
@@ -87,4 +87,9 @@
     border-radius: 2px;
     background-color: #fdfdfd;
     box-shadow: 1px 1px 1px #f0f0f0;
+}
+
+#halowiki-frame {
+	width: 100%;
+	min-height: 300px;
 }

@@ -32,7 +32,8 @@
   "web_accessible_resources": [
     "img/icon.svg",
     "style/icon.css",
-    "main.html"
+    "main.html",
+    "wiki.html"
   ],
 
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"

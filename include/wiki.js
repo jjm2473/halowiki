@@ -1,5 +1,7 @@
 $(document).ready(function() {
 
+    var params = new URLSearchParams(location.search);
+    console.log('params', params.toString());
     window.onhashchange = function() {
         var word = get_current_word();
         show_def(word);

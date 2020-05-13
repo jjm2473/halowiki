@@ -26,12 +26,10 @@ var haloword_opened = false;
 var haloword_html = '<div id="haloword-lookup" class="ui-widget-content">\
 <div id="haloword-title">\
 <span id="haloword-word"></span>\
-<a herf="#" id="haloword-pron" class="haloword-button" title="发音"></a>\
-<audio id="haloword-audio"></audio>\
 <div id="haloword-control-container">\
 <a herf="#" id="haloword-add" class="haloword-button" title="加入单词表"></a>\
 <a herf="#" id="haloword-remove" class="haloword-button" title="移出单词表"></a>\
-<a href="#" id="haloword-open" class="haloword-button" title="查看单词详细释义" target="_blank"></a>\
+<a href="#" id="haloword-open" class="haloword-button" title="在新窗口打开" target="_blank"></a>\
 <a herf="#" id="haloword-close" class="haloword-button" title="关闭查询窗"></a>\
 </div>\
 <br style="clear: both;" />\
@@ -80,40 +78,6 @@ else {
 
 $("#haloword-lookup").draggable({ handle: "#haloword-title" });
 
-$("#haloword-pron").click(function() {
-    // HACK: fix Chrome won't play second time
-    // Thank @fanzeyi :)
-    var audio = $("#haloword-audio")[0],
-        src = audio.currentSrc;
-    audio.src = "http://www.google.com/404";
-    audio.play();
-    audio.src = src;
-    audio.play();
-});
-
-function pron_exist(word, is_upper) {
-    /* URL: http://www.gstatic.com/dictionary/static/sounds/oxford/iridium--_us_1.mp3 */
-    var pron_url = (window.location.protocol === "https:" ? "https://ssl" : "http://www") + ".gstatic.com/dictionary/static/sounds/oxford/" + word + "--_us_1.mp3";
-    if (is_english(word) || is_upper) {
-        $.ajax({
-            url: pron_url,
-            timeout: 3000,
-            success: function() {
-                var current_word = $("#haloword-word").html().toLowerCase();
-                if (word == current_word || word.substring(1).toLowerCase() == current_word) {
-                    $("#haloword-audio").attr("src", pron_url);
-                    $("#haloword-pron").show();
-                }
-            },
-            error: function(xhr, d, e) {
-                if (!is_upper) {
-                    pron_exist('!' + word[0].toUpperCase() + word.substring(1), true);
-                }
-            }
-        });
-    }
-}
-
 function get_selection() {
     var selection = $.trim(window.getSelection());
     if (!selection) {
@@ -156,12 +120,13 @@ function event_mouseup(e) {
             }
 
             $("#haloword-word").html(selection);
+            var wikiUrl = chrome.extension.getURL('wiki.html') + '#' + encodeURIComponent(selection);
 
             var windowWidth = $(window).outerWidth(),
                 halowordWidth = $("#haloword-lookup").outerWidth(),
-                left = Math.min(windowWidth + scrollX - halowordWidth, e.pageX);
-            $("#haloword-lookup").attr("style", "left: " + left + "px;" + "top: " + e.pageY + "px;");
-            $("#haloword-open").attr("href", chrome.extension.getURL("main.html#" + selection));
+                left = Math.min(windowWidth + scrollX - halowordWidth, e.clientX);
+            $("#haloword-lookup").attr("style", "left: " + left + "px;" + "top: " + e.clientY + "px;");
+            $("#haloword-open").attr("href", wikiUrl);
             $("#haloword-close").click(function() {
                 $("#haloword-lookup").hide();
                 $("#haloword-remove").hide();
@@ -172,58 +137,8 @@ function event_mouseup(e) {
 
             $("#haloword-remove").hide();
 
-            chrome.extension.sendMessage({method: "find", word: selection}, function(response) {
-                if (response.exist) {
-                    $("#haloword-add").hide();
-                    $("#haloword-remove").show();
-                }
-                else {
-                    $("#haloword-remove").hide();
-                    $("#haloword-add").show();
-                }
-            });
-
-            $("#haloword-pron").hide();
-            $("#haloword-content").html("<p>Loading definitions...</p>");
+            $("#haloword-content").html('<iframe id="halowiki-frame" src="' + wikiUrl + '"></iframe>');
             $("#haloword-lookup").show();
-
-            chrome.extension.sendMessage({method: "lookup", word: selection}, function(response) {
-                var data = response.data;
-                if (response.status === "success") {
-                    var def = "", i;
-                    if (data.errorCode === 0) {
-                        if (data.basic) {
-                            if (data.basic.phonetic) {
-                                def += '<p class="phonetic"><span>' + data.basic.phonetic + '</span></p>';
-                            }
-
-                            for (i in data.basic.explains) {
-                                def += "<p>" + data.basic.explains[i] + "</p>";
-                            }
-
-                            $("#haloword-content").html(def);
-
-                            pron_exist(selection.toLowerCase(), false);
-                        }
-                        else if (data.translation) {
-                            for (i in data.translation) {
-                                def += "<p>" + data.translation[i] + "</p>";
-                            }
-                            $("#haloword-content").html(def);
-                        }
-                        else {
-                            // no definition and translation
-                            $("#haloword-content").html("<p>I'm sorry, Dave.</p><p>I'm afraid I can't find that.</p>");
-                        }
-                    }
-                    else {
-                        $("#haloword-content").html("<p>I'm sorry, Dave.</p><p>I'm afraid I can't find that.</p>");
-                    }
-                }
-                else {
-                    $("#haloword-content").html("<p style=\"color:red\">" + data.statusText + "</p>");
-                }
-            });
 
             // HACK: fix dict window not openable
             setTimeout(function() {
