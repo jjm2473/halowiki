@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "manifest_version": 2,
 
-  "description": "查询Wikimedia兼容wiki",
+  "description": "查询MediaWiki兼容的Wiki条目",
   "icons": {
     "16": "icon-16.png",
     "32": "icon-32.png",
