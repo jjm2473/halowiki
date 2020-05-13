@@ -120,7 +120,7 @@ function event_mouseup(e) {
             }
 
             $("#haloword-word").html(selection);
-            var wikiUrl = chrome.extension.getURL('wiki.html') + '#' + encodeURIComponent(selection);
+            var wikiUrl = chrome.extension.getURL('wiki.html') + '?q=' + encodeURIComponent(selection);
 
             var windowWidth = $(window).outerWidth(),
                 halowordWidth = $("#haloword-lookup").outerWidth(),

@@ -1,11 +1,6 @@
 $(document).ready(function() {
 
     var params = new URLSearchParams(location.search);
-    console.log('params', params.toString());
-    window.onhashchange = function() {
-        var word = get_current_word();
-        show_def(word);
-    };
     $(window).load(on_resize);
     $(window).resize(on_resize);
 
@@ -14,7 +9,7 @@ $(document).ready(function() {
         $('html').addClass('windows');
     }
 
-    show_def(get_current_word());
+    show_def(params.get("q"));
 });
 
 function get_OS() {
@@ -48,9 +43,6 @@ function on_resize() {
 }
 
 /* QUERY */
-function get_current_word() {
-    return decodeURIComponent(location.hash.substring(1));
-}
 
 function show_def(word) {
     if (!word) {
@@ -100,14 +92,13 @@ function fix_links(baseUrl, selector) {
     var wikiPrefix = baseUrl.pathname + 'wiki/';
     $(selector).each(function(i,a) {
         var origHref = a.attributes.href.value;
-        if (origHref.startsWith(wikiPrefix) && origHref.indexOf('#') == -1 && origHref.indexOf('?') == -1) {
+        if (origHref.startsWith(baseUrl.origin)) {
+            origHref = origHref.substring(baseUrl.origin.length);
+        }
+        if (origHref.startsWith(wikiPrefix) && origHref.indexOf('?') == -1) {
             // wiki
             var encodedWord = origHref.substring(wikiPrefix.length);
-            var hashIdx = encodedWord.indexOf('#');
-            if (hashIdx != -1) {
-                encodedWord = encodedWord.substring(0, hashIdx);
-            }
-            a.href = '#'+encodedWord;
+            a.href = '?q=' + encodedWord;
         } else if (origHref.startsWith('//')) {
             // external link
             a.href = baseUrl.protocol + origHref;
@@ -116,8 +107,8 @@ function fix_links(baseUrl, selector) {
             a.href = baseUrl.origin + origHref;
         } else if (origHref.startsWith('#')) {
             // in page hash link
-            a.href = 'javascript:void(0);';
-            a.onclick = scrollTo.bind(null, origHref);
+            //a.href = 'javascript:void(0);';
+            //a.onclick = scrollTo.bind(null, origHref);
         } else if (origHref.indexOf('://') == -1) {
             var lastSlash = baseUrl.href.lastIndexOf('/');
             if (lastSlash == -1) {

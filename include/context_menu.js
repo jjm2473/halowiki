@@ -1,7 +1,7 @@
 var tabId = false;
 
 function contextMenuOnClick(info, t) {
-    var tabParam = {url: "wiki.html#" + encodeURIComponent(info.selectionText), active: true};
+    var tabParam = {url: "wiki.html?q=" + encodeURIComponent(info.selectionText), active: true};
     var createTab = function() {
       chrome.tabs.create(tabParam, function(tab) {
         tabId = tab.id;
