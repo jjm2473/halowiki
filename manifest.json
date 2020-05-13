@@ -1,22 +1,16 @@
 {
-  "name": "Fork Halo Word Dictionary",
-  "short_name": "Fork Halo Word",
+  "name": "Halo Wiki",
+  "short_name": "Halo Wiki",
   "version": "0.0.1",
   "manifest_version": 2,
 
-  "description": "精巧易用的英汉字典，界面简洁舒适。包含单词表、划词查询、右键查询等功能。Enjoy!",
+  "description": "查询Wikimedia兼容wiki",
   "icons": {
     "16": "icon-16.png",
     "32": "icon-32.png",
     "48": "icon-48.png",
     "128": "icon-128.png",
     "256": "icon-256.png"
-  },
-
-  "app": {
-    "launch": {
-      "local_path": "main.html"
-    }
   },
 
   "background": {

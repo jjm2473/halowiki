@@ -14,8 +14,10 @@ chrome.extension.onMessage.addListener(
             remove_word(request.word);
         }
         else if (request.method == "lookup") {
+            // sendResponse({status: "error", data: {statusCode: 500, statusText: "500"}});
+            // return;
             $.ajax({
-                url: youdao_url + request.word,
+                url: 'https://jjm2473.fandom.com/zh/api.php?action=parse&format=json&redirects=1&prop=text%7Cdisplaytitle&disabletoc=1&page='+encodeURI(request.word),
                 dataType: "json",
                 async: false,
                 success: function(data) {

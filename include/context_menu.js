@@ -1,7 +1,7 @@
 var tabId = false;
 
 function contextMenuOnClick(info, t) {
-    var tabParam = {url: "main.html#" + encodeURIComponent(info.selectionText), active: true};
+    var tabParam = {url: "wiki.html#" + encodeURIComponent(info.selectionText), active: true};
     var createTab = function() {
       chrome.tabs.create(tabParam, function(tab) {
         tabId = tab.id;
@@ -21,4 +21,4 @@ function contextMenuOnClick(info, t) {
     }
 }
 
-var id = chrome.contextMenus.create({"title": "用 Halo Word 查询", "contexts":["selection"], "onclick": contextMenuOnClick});
+var id = chrome.contextMenus.create({"title": "用 Halo Wiki 查询", "contexts":["selection"], "onclick": contextMenuOnClick});

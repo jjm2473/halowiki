@@ -231,7 +231,7 @@ function event_mouseup(e) {
                     }
                 }
                 else {
-                    $("#extradef").hide();
+                    $("#haloword-content").html("<p style=\"color:red\">" + data.statusText + "</p>");
                 }
             });
 
