@@ -73,13 +73,13 @@ function show_wiki(word) {
         success: function(data) {
             if (data.error) {
                 if (data.error.code === 'missingtitle') {
-                    $("#worddef").html('<h1>词条不存在，<a href="' + wikihost + 'wiki/' + encodedWord + '?veaction=edit">创建</a></h1>');
+                    $("#worddef").html('<h1>词条不存在，<a href="' + wikihost + encodedWord + '?veaction=edit">创建</a></h1>');
                 } else {
                     $("#worddef").html('<p style="color:red">' + data.error.info + '</p>');
                 }
             } else {
                 $("#wordtitle").html(data.parse.displaytitle);
-                $("#worddef").html('<div><h1 id="' + word + '">' + data.parse.displaytitle + '&nbsp;<a style="float: right;" href="' + wikihost + 'wiki/' + encodedWord + '?veaction=edit">编辑</a></h1><hr/>' 
+                $("#worddef").html('<div><h1 id="' + word + '">' + data.parse.displaytitle + '&nbsp;<a style="float: right;" href="' + wikihost + encodedWord + '?veaction=edit">编辑</a></h1><hr/>' 
                     + data.parse.text["*"] 
                     + '</div>');
                 fix_links(baseUrl, '#worddef .mw-parser-output a');
@@ -89,15 +89,17 @@ function show_wiki(word) {
 }
 
 function fix_links(baseUrl, selector) {
-    var wikiPrefix = baseUrl.pathname + 'wiki/';
     $(selector).each(function(i,a) {
+        if (!a.attributes.href) {
+            return;
+        }
         var origHref = a.attributes.href.value;
         if (origHref.startsWith(baseUrl.origin)) {
             origHref = origHref.substring(baseUrl.origin.length);
         }
-        if (origHref.startsWith(wikiPrefix) && origHref.indexOf('?') == -1) {
+        var encodedWord = is_wiki(baseUrl, origHref);
+        if (encodedWord !== undefined) {
             // wiki
-            var encodedWord = origHref.substring(wikiPrefix.length);
             a.href = '?q=' + encodedWord;
         } else if (origHref.startsWith('//')) {
             // external link
@@ -118,6 +120,20 @@ function fix_links(baseUrl, selector) {
             }
         }
     });
+}
+
+function is_wiki(baseUrl, href) {
+    if (href.startsWith(baseUrl.pathname) && href.indexOf('?') == -1) {
+        var word = href.substring(baseUrl.pathname.length);
+        if (word.startsWith('wiki/')) {
+            // wikipedia, fandom, etc.
+            return word.substring(5);
+        }
+        if (word.indexOf('/') == -1 && !word.endsWith('.php') && word.indexOf('.php#') == -1 && !word.startsWith('File:')) {
+            // zh.moegirl.org
+            return word;
+        }
+    }
 }
 
 function scrollTo(selector) {

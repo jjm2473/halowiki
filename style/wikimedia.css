@@ -31,3 +31,34 @@
     margin-right: 2px
 }
 
+.mw-parser-output a.new {
+    color: #ba0000;
+}
+
+.mw-parser-output a.new:visited {
+    color: #a55858;
+}
+
+.mw-parser-output a.external {
+    color: #36b;
+}
+
+.mw-parser-output a.external:visited {
+    color: #636;
+}
+
+.mw-parser-output .navbox-group {
+    white-space: nowrap;
+}
+
+.navbox-group, .navbox-subgroup .navbox-title {
+    background: none repeat scroll 0 0 #fbd489;
+}
+
+.navbox-subgroup .navbox-group {
+    background: none repeat scroll 0 0 #fff5e2;;
+}
+
+.navbox-title {
+    background: none repeat scroll 0 0 #fdc258;
+}
