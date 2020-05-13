@@ -15,5 +15,5 @@ The icons of this project are from [Oxygen Icons](https://github.com/KDE/oxygen-
 ```sh
 npm install -g less
 cd style
-lessc styles.less styles.css
+lessc style.less style.css
 ```
