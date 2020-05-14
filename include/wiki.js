@@ -64,6 +64,14 @@ function show_def(word) {
 
 var wikihost = 'https://jjm2473.fandom.com/zh/';
 
+function wiki_path(encodedWord) {
+    return 'index.php?title=' + encodedWord;
+}
+
+function edit_path(encodedWord) {
+    return wiki_path(encodedWord) + '&veaction=edit';
+}
+
 function show_wiki(word) {
     var encodedWord = encodeURIComponent(word);
     var baseUrl = new URL(wikihost);
@@ -73,13 +81,20 @@ function show_wiki(word) {
         success: function(data) {
             if (data.error) {
                 if (data.error.code === 'missingtitle') {
-                    $("#worddef").html('<h1>词条不存在，<a href="' + wikihost + encodedWord + '?veaction=edit">创建</a></h1>');
+                    $("#worddef").html('<h1>词条不存在，<a href="' + wikihost + edit_path(encodedWord) + '">创建</a></h1>');
                 } else {
                     $("#worddef").html('<p style="color:red">' + data.error.info + '</p>');
                 }
             } else {
                 $("#wordtitle").html(data.parse.displaytitle);
-                $("#worddef").html('<div><h1 id="' + word + '">' + data.parse.displaytitle + '&nbsp;<a style="float: right;" href="' + wikihost + encodedWord + '?veaction=edit">编辑</a></h1><hr/>' 
+                var redirects = '';
+                if (data.parse.redirects) {
+                    redirects = '<span class="small">(' 
+                        + data.parse.redirects.map(e=>e.from).map(k=>'<a href="' + wikihost + wiki_path(encodeURIComponent(k)) + '&redirect=no">' + k + '</a>').join('/')
+                            + ')</span>';
+                }
+                $("#worddef").html('<div><h1 id="' + word + '">' + data.parse.displaytitle + '&nbsp;<a style="float: right;" href="' + wikihost + edit_path(encodeURIComponent(data.parse.title)) + '">编辑</a>' 
+                    + redirects + '</h1><hr/>' 
                     + data.parse.text["*"] 
                     + '</div>');
                 fix_links(baseUrl, '#worddef .mw-parser-output a');
@@ -123,15 +138,29 @@ function fix_links(baseUrl, selector) {
 }
 
 function is_wiki(baseUrl, href) {
-    if (href.startsWith(baseUrl.pathname) && href.indexOf('?') == -1) {
+    if (!href.startsWith('/')) {
+        return;
+    }
+    if (href.startsWith('/wiki/') && href.indexOf('?') == -1) {
+        // wikipedia
+        return href.substring(6);
+    }
+    if (href.startsWith(baseUrl.pathname)) {
         var word = href.substring(baseUrl.pathname.length);
-        if (word.startsWith('wiki/')) {
-            // wikipedia, fandom, etc.
-            return word.substring(5);
+        if (word.startsWith('index.php?title=') && href.indexOf('&') == -1) {
+            // wiki.citydatum.com
+            return word.substring('index.php?title='.length);
         }
-        if (word.indexOf('/') == -1 && !word.endsWith('.php') && word.indexOf('.php#') == -1 && !word.startsWith('File:')) {
-            // zh.moegirl.org
-            return word;
+        if (word.indexOf('?') == -1) {
+            if (word.startsWith('wiki/')) {
+                // wikipedia, fandom, etc.
+                return word.substring(5);
+            }
+
+            if (word.indexOf('/') == -1 && !word.endsWith('.php') && word.indexOf('.php#') == -1 && !word.startsWith('File:')) {
+                // zh.moegirl.org, minecraft-zh.gamepedia.com
+                return word;
+            }
         }
     }
 }

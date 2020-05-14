@@ -1,0 +1,30 @@
+<h1>rules</h1>
+
+<div>
+    <label>默认：</label>
+    <select id="default"></select>
+</div>
+
+<script>
+    (function(){
+        rpc({
+            url: 'api/config',
+            success: config => {
+                var select = $('#default');
+                config.sites.forEach(site => {
+                    select.append('<option value="'+site.url+'"'+(site.url == config.defaultSite?' selected':'')+'>'+site.name+'</option>');
+                });
+                $('#default').on('change', e => {
+                    rpc({
+                        url: 'api/config',
+                        method: 'post',
+                        data: {defaultSite: e.target.value},
+                        error: e => {
+                            console.error('update defaultSite', e);
+                        }
+                    });
+                });
+            }
+        });
+    })();
+</script>
