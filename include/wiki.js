@@ -1,8 +1,6 @@
 $(document).ready(function() {
 
     var params = new URLSearchParams(location.search);
-    $(window).load(on_resize);
-    $(window).resize(on_resize);
 
     /* Special fixes for Windows */
     if (get_OS() == "Windows") {
@@ -28,41 +26,26 @@ function get_OS() {
 }
 
 /* UI */
-
-function on_resize() {
-    var OS = get_OS();
-    if (OS == "Mac OS X") {
-        $("#wordlist").height($(window).height() - 146);
-    }
-    else if (OS == "node-webkit") {
-        $("#wordlist").height($(window).height() - 102);
-    }
-    else {
-        $("#wordlist").height($(window).height() - 156);
-    }
-}
-
 /* QUERY */
 
 function show_def(word) {
+    $("#footer").hide();
     if (!word) {
-        $("#wordtitle").html('');
         $("#worddef").html('');
         return;
     }
 
-    /* fixing a refresh issue. */
-    window.word = word;
-
     show_builtin("wiki_loading", function () {
-        document.title = word + " \u2039 Halo Word";
-        $("#wordtitle").html(word);
-
-        show_wiki(word);
+        document.title = word;
+        getConfig(config => {
+            var url = config.defaultSite;
+            var site = config.sites.filter(s=>s.url==url)[0] || {url:url, name:url};
+            show_wiki(site, word);
+        }, error => {
+            show_error(error.message);
+        });
     });
 }
-
-var wikihost = 'https://jjm2473.fandom.com/zh/';
 
 function wiki_path(encodedWord) {
     return 'index.php?title=' + encodedWord;
@@ -72,13 +55,20 @@ function edit_path(encodedWord) {
     return wiki_path(encodedWord) + '&veaction=edit';
 }
 
-function show_wiki(word) {
+function show_error(info) {
+    $("#worddef").html('<p style="color:red">' + info + '</p>');
+}
+
+function show_wiki(site, word) {
     var encodedWord = encodeURIComponent(word);
+    var wikihost = site.url;
     var baseUrl = new URL(wikihost);
     $.ajax({
         url: wikihost + 'api.php?action=parse&format=json&redirects=1&disabletoc=1&page=' + encodedWord,
         dataType: "json",
         success: function(data) {
+            $("#site-link").attr('href', wikihost).text(site.name);
+            $("#footer").show();
             if (data.error) {
                 if (data.error.code === 'missingtitle') {
                     $("#worddef").html('<h1>词条不存在，<a href="' + wikihost + edit_path(encodedWord) + '">创建</a></h1>');
@@ -88,7 +78,7 @@ function show_wiki(word) {
             } else {
                 $("#wordtitle").html(data.parse.displaytitle);
                 var redirects = '';
-                if (data.parse.redirects) {
+                if (data.parse.redirects && data.parse.redirects.length > 0) {
                     redirects = '<span class="small">(' 
                         + data.parse.redirects.map(e=>e.from).map(k=>'<a href="' + wikihost + wiki_path(encodeURIComponent(k)) + '&redirect=no">' + k + '</a>').join('/')
                             + ')</span>';

@@ -1,4 +1,3 @@
-<h1>rules</h1>
 
 <div>
     <label>默认：</label>
@@ -7,9 +6,8 @@
 
 <script>
     (function(){
-        rpc({
-            url: 'api/config',
-            success: config => {
+        getConfig(
+            config => {
                 var select = $('#default');
                 config.sites.forEach(site => {
                     select.append('<option value="'+site.url+'"'+(site.url == config.defaultSite?' selected':'')+'>'+site.name+'</option>');
@@ -25,6 +23,6 @@
                     });
                 });
             }
-        });
+        );
     })();
 </script>
