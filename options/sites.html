@@ -13,7 +13,7 @@
         </thead>
         <tbody id="sites">
             <!-- {{#sites}} -->
-            <tr>
+            <tr id="{{id}}">
                 <td><input name="name" type="text" value="{{name}}" required readonly></td>
                 <td><input name="url" type="url" value="{{url}}" required readonly></td>
                 <td><input type="button" class="delete" value="删除"></td>
@@ -25,6 +25,21 @@
 <script>
     (function(){
         console.log('sites.html');
+        var url2id = function(url) {
+            return 'site-' + btoa(encodeURIComponent(url)).replace(/\=/g, '').replace(/\//, '_').replace(/\+/, '-');
+        };
+        var id2url = function(id) {
+            return decodeURIComponent(atob(id.substring(5).replace(/\-/g, '+').replace(/\_/, '/')));
+        };
+        var urlDuplicated = function(id, ignore) {
+            var existed = $('#'+id).not(ignore);
+            if (existed.length > 0) {
+                var e = existed.find('[name="url"]').get(0);
+                e.classList.add('blink');
+                setTimeout(()=>{e.classList.remove('blink');}, 1000);
+                return true;
+            }
+        };
         var inputSelector = 'input[type="text"],input[type="url"]';
         $('#sites').on('click', inputSelector, e => {
             var target = e.target;
@@ -34,7 +49,8 @@
             target.focus();
         }).on('blur', inputSelector, e => {
             var target = e.target;
-            var row = $(target).closest('tr').find('input');
+            var tr = $(target).closest('tr');
+            var row = tr.find('input');
             var validate = true;
             row.each((i,e)=>{
                 if (!e.checkValidity()) {
@@ -42,14 +58,26 @@
                     return false;
                 }
             });
+            if (validate && target.name == 'url') {
+                var id = url2id(target.value);
+                if (urlDuplicated(id, tr)) {
+                    validate = false;
+                } else {
+                    tr.get(0).id = id;
+                }
+            }
             if (validate) {
                 target.readOnly = true;
                 target.classList.remove('invalid');
                 row.removeAttr('disabled');
             } else {
-                target.classList.add('invalid');
-                target.focus();
+                setTimeout(()=>{
+                    target.classList.add('invalid');
+                    target.focus();
+                },0);
             }
+        }).on('change', inputSelector, e => {
+            console.log(e);
         });
         $('#form').on('blur', inputSelector, e => {
             e.target.classList.remove('invalid');
@@ -61,6 +89,9 @@
         getConfig(
             config => {
                 var siteTemplate = $('#sites').html();
+                config.sites.forEach(site => {
+                    site.id = url2id(site.url);
+                });
                 var list = Mustache.render(siteTemplate, config);
                 $('#sites').html(list);
                 $('#add').on('click', e => {
@@ -79,9 +110,15 @@
                     });
                     if (validate) {
                         var site = row.form();
-                    
-                        row.val('');
-                        $('#sites').prepend(Mustache.render(siteTemplate, {sites:[site]}));
+                        site.id = url2id(site.url);
+                        if (urlDuplicated(site.id)) {
+                            var e = row.filter('[name="url"]').get(0);
+                            e.classList.add('invalid');
+                            e.focus();
+                        } else {
+                            row.val('');
+                            $('#sites').prepend(Mustache.render(siteTemplate, {sites:[site]}));
+                        }
                     }
                 });
                 $('#save').on('click', e => {

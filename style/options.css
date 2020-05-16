@@ -28,3 +28,21 @@ input.invalid {
 input.invalid:focus {
     outline-color: #c00;
 }
+
+@keyframes blink {
+    0%{ outline-color: red; }
+    50% { outline-color: white; }
+    100%{ outline-color: red; }
+}
+
+@-webkit-keyframes blink {
+    0%{ outline-color: red; }
+    50% { outline-color: white; }
+    100%{ outline-color: red; }
+}
+
+.blink {
+    outline: red auto 5px;
+    animation: blink 1s linear infinite;
+    -webkit-animation: blink 1s linear infinite;
+}
