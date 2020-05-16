@@ -1,3 +1,30 @@
 #side li.external {
     color: #7fade6
 }
+
+input {
+    border: 1px solid #aaa;
+    padding: 4px 10px;
+    font: 16px/24px Georgia;
+}
+
+input:read-only {
+    color: #276bbf;
+    text-decoration: underline;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+input:disabled {
+    color: #aaa;
+    cursor: default;
+}
+
+input.invalid {
+    border-color: #c00;
+}
+
+input.invalid:focus {
+    outline-color: #c00;
+}

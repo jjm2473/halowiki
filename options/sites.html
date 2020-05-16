@@ -1,1 +1,101 @@
-<h1>sites</h1>
+
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>名称</th><th>URL</th><th><input type="button" id="save" value="保存"></th>
+            </tr>
+            <tr id="form">
+                <th><input name="name" type="text" required></th>
+                <th><input name="url" type="url" required></th>
+                <th><input type="button" id="add" value="添加"></th>
+            </tr>
+        </thead>
+        <tbody id="sites">
+            <!-- {{#sites}} -->
+            <tr>
+                <td><input name="name" type="text" value="{{name}}" required readonly></td>
+                <td><input name="url" type="url" value="{{url}}" required readonly></td>
+                <td><input type="button" class="delete" value="删除"></td>
+            </tr>
+            <!-- {{/sites}} -->
+        </tbody>
+    </table>
+</div>
+<script>
+    (function(){
+        console.log('sites.html');
+        var inputSelector = 'input[type="text"],input[type="url"]';
+        $('#sites').on('click', inputSelector, e => {
+            var target = e.target;
+            if (target.disabled) return;
+            $(target).closest('tr').find('input').not(target).attr('disabled', true);
+            target.readOnly = undefined;
+            target.focus();
+        }).on('blur', inputSelector, e => {
+            var target = e.target;
+            var row = $(target).closest('tr').find('input');
+            var validate = true;
+            row.each((i,e)=>{
+                if (!e.checkValidity()) {
+                    validate = false;
+                    return false;
+                }
+            });
+            if (validate) {
+                target.readOnly = true;
+                target.classList.remove('invalid');
+                row.removeAttr('disabled');
+            } else {
+                target.classList.add('invalid');
+                target.focus();
+            }
+        });
+        $('#form').on('blur', inputSelector, e => {
+            e.target.classList.remove('invalid');
+        });
+        $('#sites').on('click', '.delete', e => {
+            var target = e.target;
+            $(target).closest('tr').remove();
+        });
+        getConfig(
+            config => {
+                var siteTemplate = $('#sites').html();
+                var list = Mustache.render(siteTemplate, config);
+                $('#sites').html(list);
+                $('#add').on('click', e => {
+                    var target = e.target;
+                    var row = $(target).closest('tr').find('input').not(target);
+                    var validate = true;
+                    row.each((i,e)=>{
+                        if (!e.checkValidity()) {
+                            e.classList.add('invalid');
+                            e.focus();
+                            validate = false;
+                            return false;
+                        } else {
+                            e.classList.remove('invalid');
+                        }
+                    });
+                    if (validate) {
+                        var site = row.form();
+                    
+                        row.val('');
+                        $('#sites').prepend(Mustache.render(siteTemplate, {sites:[site]}));
+                    }
+                });
+                $('#save').on('click', e => {
+                    var sites = $('#sites tr').map((i,e)=>$(e).find('input').form()).get();
+                    rpc({
+                        url: 'api/config',
+                        method: 'post',
+                        data: {sites},
+                        error: e => {
+                            console.error('update sites', e);
+                        }
+                    });
+                });
+            }
+        );
+    })();
+</script>
