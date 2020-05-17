@@ -15,14 +15,20 @@
     var handlers = {
         site:{
             put: function({data}){
-                addSite(data, (e)=>{
-                    this.sendResponse(e?e:{code:200});
+                addSite(data, r => {
+                    this.sendResponse(r);
+                });
+            },
+            post: function({pathseg, data}) {
+                var url = pathseg[1];
+                updateSite(url, data, r => {
+                    this.sendResponse(r);
                 });
             },
             delete: function({pathseg}){
                 var url = pathseg[1];
-                removeSite(url, (e)=>{
-                    this.sendResponse(e?e:{code:200});
+                removeSite(url, r => {
+                    this.sendResponse(r);
                 });
             },
         },
@@ -76,7 +82,7 @@
                 update = true;
             }
         });
-        var mock = function(){
+        var mock = function() {
             chrome.extension.onMessage.addListener(
                 function(request, sender, sendResponse) {
                     var url = new URL(request.url, 'http://localhost/');
@@ -85,6 +91,7 @@
                     if (request.pathseg[0] == 'api') {
                         request.pathseg = request.pathseg.slice(1);
                     }
+                    request.pathseg = request.pathseg.map(s=>decodeURIComponent(s));
                     request.query = url.search;
                     request.searchParams = url.searchParams;
                     handle(request, sendResponse);

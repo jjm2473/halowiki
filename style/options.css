@@ -43,6 +43,6 @@ input.invalid:focus {
 
 .blink {
     outline: red auto 5px;
-    animation: blink 1s linear infinite;
-    -webkit-animation: blink 1s linear infinite;
+    animation: blink 0.5s linear infinite;
+    -webkit-animation: blink 0.5s linear infinite;
 }

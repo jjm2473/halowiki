@@ -11,8 +11,8 @@ function addSite(site, cb) {
         if (r.sites.filter(s => s.url == site.url).length > 0) {
             cb({code:400, message:site.url + ' existed'});
         } else {
-            r.sites.append(site);
-            updateOptions(r, cb);
+            r.sites.unshift(site);
+            updateOptions(r, ()=>cb({code:200}));
         }
     });
 }
@@ -25,7 +25,7 @@ function addSite(site, cb) {
 function removeSite(url, cb) {
     getOptions('sites', r => {
         r.sites = r.sites.filter(s => s.url != url);
-        updateOptions(r, cb);
+        updateOptions(r, ()=>cb({code:200}));
     });
 }
 
@@ -52,6 +52,21 @@ function getSite(url, cb) {
 function getSites(cb) {
     getOptions('sites', r => {
         cb({code:200, data:r.sites});
+    });
+}
+
+/**
+ * 
+ * @param {string} url 
+ * @param {Object} site 
+ * @param {string} site.url
+ * @param {string} site.name
+ * @param {updateCallback} cb 
+ */
+function updateSite(url, site, cb) {
+    getOptions('sites', r => {
+        r.sites[r.sites.findIndex(s=>s.url==url)] = site;
+        updateOptions(r, ()=>cb({code:200}));
     });
 }
 
