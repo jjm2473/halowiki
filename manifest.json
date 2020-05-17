@@ -36,5 +36,9 @@
     "wiki.html"
   ],
   "options_page": "options.html",
+  "browser_action": {
+		"default_title": "Halo Wiki",
+		"default_popup": "popup.html"
+	},
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

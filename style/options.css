@@ -51,3 +51,27 @@ input.invalid:focus {
     animation: blink 0.5s linear infinite;
     -webkit-animation: blink 0.5s linear infinite;
 }
+
+body.popup {
+    width: auto;
+    min-width: 180px;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+#default {
+    min-width: 100px;
+}
+
+.popup #side {
+    width: 100%;
+    text-align: left;
+    float: none;
+    border-right: none;
+}
+
+.popup #side li{
+    padding-left: 4px;
+    font-size: 16px;
+    line-height: 24px;
+}
