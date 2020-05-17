@@ -88,6 +88,7 @@ function show_wiki(site, word) {
                     + data.parse.text["*"] 
                     + '</div>');
                 fix_links(baseUrl, '#worddef .mw-parser-output a');
+                fix_imgs(baseUrl, '#worddef .mw-parser-output img');
             }
         }
     });
@@ -127,15 +128,31 @@ function fix_links(baseUrl, selector) {
     });
 }
 
+function fix_imgs(baseUrl, selector) {
+    $(selector).each(function(i,a) {
+        if (a.attributes.srcset) {
+            a.srcset = a.attributes.srcset.value.split(', ')
+                .map(s=>s.replace(' ','#'))
+                .map(s=>new URL(s, baseUrl).href)
+                .map(s=>s.replace('#', ' '))
+                .join(', ');
+        }
+        if (a.attributes.src) {
+            var origHref = a.attributes.src.value;
+            a.src = new URL(origHref, baseUrl).href;
+        }
+    });
+}
+
 function is_wiki(baseUrl, href) {
     if (!href.startsWith('/')) {
         return;
     }
+    var candidate = null;
     if (href.startsWith('/wiki/') && href.indexOf('?') == -1) {
         // wikipedia
-        return href.substring(6);
-    }
-    if (href.startsWith(baseUrl.pathname)) {
+        candidate = href.substring(6);
+    } else if (href.startsWith(baseUrl.pathname)) {
         var word = href.substring(baseUrl.pathname.length);
         if (word.startsWith('index.php?title=') && href.indexOf('&') == -1) {
             // wiki.citydatum.com
@@ -144,13 +161,17 @@ function is_wiki(baseUrl, href) {
         if (word.indexOf('?') == -1) {
             if (word.startsWith('wiki/')) {
                 // wikipedia, fandom, etc.
-                return word.substring(5);
-            }
-
-            if (word.indexOf('/') == -1 && !word.endsWith('.php') && word.indexOf('.php#') == -1 && !word.startsWith('File:')) {
+                candidate = word.substring(5);
+            } else if (word.indexOf('/')) {
                 // zh.moegirl.org, minecraft-zh.gamepedia.com
-                return word;
+                candidate = word;
             }
+        }
+    }
+    if (candidate) {
+        if (!candidate.endsWith('.php') && candidate.indexOf('.php#') == -1 && !candidate.startsWith('File:')) {
+            // zh.moegirl.org, minecraft-zh.gamepedia.com
+            return candidate;
         }
     }
 }
