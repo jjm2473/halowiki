@@ -29,6 +29,11 @@ input.invalid:focus {
     outline-color: #c00;
 }
 
+.main_field {
+    width: 100%;
+    box-sizing: border-box;
+}
+
 @keyframes blink {
     0%{ outline-color: red; }
     50% { outline-color: white; }
