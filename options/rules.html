@@ -9,9 +9,18 @@
         getConfig(
             config => {
                 var select = $('#default');
+                var found = false;
                 config.sites.forEach(site => {
-                    select.append('<option value="'+site.url+'"'+(site.url == config.defaultSite?' selected':'')+'>'+site.name+'</option>');
+                    var selected = '';
+                    if (site.url == config.defaultSite) {
+                        found = true;
+                        selected = ' selected';
+                    }
+                    select.append('<option value="' + site.url + '"' + selected + '>' + site.name + '</option>');
                 });
+                if (!found) {
+                    select.append('<option value="' + config.defaultSite + '" selected>' + config.defaultSite + '</option>');
+                }
                 $('#default').on('change', e => {
                     rpc({
                         url: 'api/config',
