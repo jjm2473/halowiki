@@ -36,7 +36,7 @@ function show_def(word) {
     }
 
     show_builtin("wiki_loading", function () {
-        document.title = word;
+        document.title = word + ' - Halo Wiki';
         getConfig(config => {
             var url = config.defaultSite;
             var site = config.sites.filter(s=>s.url==url)[0] || {url:url, name:url};
@@ -71,7 +71,7 @@ function show_wiki(site, word) {
             $("#footer").show();
             if (data.error) {
                 if (data.error.code === 'missingtitle') {
-                    $("#worddef").html('<h1>词条不存在，<a href="' + wikihost + edit_path(encodedWord) + '">创建</a></h1>');
+                    $("#worddef").html('<h1>词条不存在，<a href="' + wikihost + edit_path(encodedWord) + '" target="_blank">创建</a></h1>');
                 } else {
                     $("#worddef").html('<p style="color:red">' + data.error.info + '</p>');
                 }
@@ -80,10 +80,10 @@ function show_wiki(site, word) {
                 var redirects = '';
                 if (data.parse.redirects && data.parse.redirects.length > 0) {
                     redirects = '<span class="small">(' 
-                        + data.parse.redirects.map(e=>e.from).map(k=>'<a href="' + wikihost + wiki_path(encodeURIComponent(k)) + '&redirect=no">' + k + '</a>').join('/')
+                        + data.parse.redirects.map(e=>e.from).map(k=>'<a href="' + wikihost + wiki_path(encodeURIComponent(k)) + '&redirect=no" target="_blank">' + k + '</a>').join('/')
                             + ')</span>';
                 }
-                $("#worddef").html('<div><h1 id="' + word + '">' + data.parse.displaytitle + '&nbsp;<a style="float: right;" href="' + wikihost + edit_path(encodeURIComponent(data.parse.title)) + '">编辑</a>' 
+                $("#worddef").html('<div><h1 id="' + word + '">' + data.parse.displaytitle + '&nbsp;<a style="float: right;" href="' + wikihost + edit_path(encodeURIComponent(data.parse.title)) + '" target="_blank">编辑</a>' 
                     + redirects + '</h1><hr/>' 
                     + data.parse.text["*"] 
                     + '</div>');
@@ -107,23 +107,13 @@ function fix_links(baseUrl, selector) {
         if (encodedWord !== undefined) {
             // wiki
             a.href = '?q=' + encodedWord;
-        } else if (origHref.startsWith('//')) {
-            // external link
-            a.href = baseUrl.protocol + origHref;
-        } else if (origHref.startsWith('/')) {
-            // inner link
-            a.href = baseUrl.origin + origHref;
         } else if (origHref.startsWith('#')) {
             // in page hash link
             //a.href = 'javascript:void(0);';
             //a.onclick = scrollTo.bind(null, origHref);
-        } else if (origHref.indexOf('://') == -1) {
-            var lastSlash = baseUrl.href.lastIndexOf('/');
-            if (lastSlash == -1) {
-                a.href = baseUrl.href + origHref;
-            } else {
-                a.href = baseUrl.href.substring(0, lastSlash+1) + origHref;
-            }
+        } else {
+            a.href = new URL(origHref, baseUrl).href;
+            a.target = '_blank';
         }
     });
 }
