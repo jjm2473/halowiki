@@ -2,11 +2,16 @@
 (function() {
     var defaultOptions = {
         sites:[
-            {url:'https://zh.moegirl.org/', name:'萌娘百科'},
-            {url:'https://minecraft-zh.gamepedia.com/', name:'我的世界'},
-            {url:'http://wiki.citydatum.com/', name:'CityDatum'},
-            {url:'https://zh.wikipedia.org/w/', name:'维基百科中文'},
-            {url:'https://jjm2473.fandom.com/zh/', name:'Fandom测试'}
+            {name:"维基百科中文",url:"https://zh.wikipedia.org/w/"},
+            {name:"萌娘百科",url:"https://zh.moegirl.org/"},
+            {name:"一把刀",url:"https://cn.18dao.net/"},
+            {name:"wikiHow",url:"https://zh.wikihow.com/"},
+            {name:"冰与火之歌",url:"https://asoiaf.huijiwiki.com/"},
+            {name:"我的世界",url:"https://minecraft-zh.gamepedia.com/"},
+            {name:"CityDatum",url:"http://wiki.citydatum.com/"},
+            {name:"Fandom测试",url:"https://jjm2473.fandom.com/zh/"},
+            {name:"wiki-site测试",url:"http://jjm2473.wiki-site.com/"},
+            {name:"EditThis测试",url:"https://editthis.info/jjm2473/"}
         ],
         rules: [],
         defaultSite: 'https://zh.wikipedia.org/w/'
