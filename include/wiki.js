@@ -87,8 +87,8 @@ function show_wiki(site, word) {
                     + redirects + '</h1><hr/>' 
                     + data.parse.text["*"] 
                     + '</div>');
-                fix_links(baseUrl, '#worddef .mw-parser-output a');
-                fix_imgs(baseUrl, '#worddef .mw-parser-output img');
+                fix_links(baseUrl, '#worddef a');
+                fix_imgs(baseUrl, '#worddef img');
             }
         }
     });
@@ -152,15 +152,14 @@ function is_wiki(baseUrl, href) {
             if (word.startsWith('wiki/')) {
                 // wikipedia, fandom, etc.
                 candidate = word.substring(5);
-            } else if (word.indexOf('/')) {
+            } else {
                 // zh.moegirl.org, minecraft-zh.gamepedia.com
                 candidate = word;
             }
         }
     }
     if (candidate) {
-        if (!candidate.endsWith('.php') && candidate.indexOf('.php#') == -1 && !candidate.startsWith('File:')) {
-            // zh.moegirl.org, minecraft-zh.gamepedia.com
+        if (candidate.indexOf('.htm') == -1 && !candidate.endsWith('.php') && candidate.indexOf('.php#') == -1 && !candidate.startsWith('File:')) {
             return candidate;
         }
     }
