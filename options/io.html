@@ -1,0 +1,51 @@
+<input hidden id="input_file" type="file" accept="application/json">
+<a hidden id="download" href="#" target="_blank" download="halowiki_backup.json">下载</a>
+<button id="export">备份</button><button id="import">恢复</button>
+
+<script>
+    (function(){
+        console.log('io.html');
+        var inputFile = document.getElementById('input_file');
+        inputFile.addEventListener('change', function() {
+            var file = this.files[0];
+            if (file !== undefined) {
+                if (file.size > 1024*8) {
+                    if (!confirm('你选择的文件超过8KB, Chrome可能不支持，确定要加载?')) {
+                        return;
+                    }
+                }
+                var reader = new FileReader();
+                reader.addEventListener('loadend', function(){
+                    var config = JSON.parse(reader.result);
+                    console.log(config);
+                    rpc({
+                        url: 'api/config',
+                        method: 'post',
+                        data: config,
+                        error: e => {
+                            console.error('import config', e);
+                            alert(e.message);
+                        }
+                    });
+                });
+                reader.readAsText(file);
+            }
+        });
+        document.getElementById('import').addEventListener('click', e=>{
+            inputFile.click();
+        });
+
+        var download = document.getElementById('download');
+        document.getElementById('export').addEventListener('click', e=>{
+            getConfig(
+                config => {
+                    var json = JSON.stringify(config);
+                    var blob = new Blob([json], {type:'application/json'});
+                    var url = URL.createObjectURL(blob);
+                    download.href = url;
+                    download.click();
+                }
+            );
+        });
+    })();
+</script>
