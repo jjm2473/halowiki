@@ -58,3 +58,18 @@ function updateSite(url, site, onsuccess, onerror) {
         error: onerror
     });
 }
+
+/**
+ * 
+ * @param {string[]} urls 
+ * @param {updateCallback} onsuccess 
+ * @param {*} onerror
+ */
+function sortSite(urls, onsuccess, onerror) {
+    rpc({url: 'api/site:sort',
+        method: 'post',
+        data: urls,
+        success: onsuccess,
+        error: onerror
+    });
+}

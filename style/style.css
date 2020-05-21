@@ -119,10 +119,7 @@ input[type='submit'] {
   background: -webkit-linear-gradient(#fafafa, #f4f4f4 40%, #e5e5e5);
   border: 1px solid #aaa;
   color: #444;
-  font-size: 13px;
-  margin: 7px 0 2px 6px;
   min-width: 4em;
-  padding: 3px 12px 3px 12px;
   outline: none;
 }
 button:hover,

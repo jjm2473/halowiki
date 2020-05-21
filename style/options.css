@@ -29,9 +29,49 @@ input.invalid:focus {
     outline-color: #c00;
 }
 
-.main_field {
+input[type='button'] {
+    min-width: auto;
+    cursor: pointer;
+}
+
+.main_field>input {
     width: 100%;
     box-sizing: border-box;
+}
+
+.ui-sortable-helper .main_field {
+    width: inherit;
+}
+
+thead {
+    border-bottom: 1px solid grey;
+}
+
+td, th {
+    padding: 5px;
+    white-space: nowrap;
+}
+
+tr {
+    line-height: normal;
+}
+
+tbody tr {
+    cursor: move;
+}
+
+.move-handler {
+    vertical-align: middle;
+    margin-left: 5px;
+    visibility: hidden;
+}
+
+tbody tr:hover {
+    background-color: #D3DFEE;
+}
+
+tr:hover .move-handler {
+    visibility: visible;
 }
 
 @keyframes blink {

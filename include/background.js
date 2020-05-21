@@ -39,6 +39,21 @@
                 });
             },
         },
+        'site:sort':{
+            post: function({data}){
+                var urls = data;
+                getOptions('sites', ({sites}) => {
+                    var map = {};
+                    sites.forEach(site=>{
+                        map[site.url] = site;
+                    });
+                    sites = urls.map(url=>map[url]).filter(site=>site !== undefined);
+                    updateOptions({sites}, () => {
+                        this.sendResponse({code:200});
+                    });
+                });
+            }
+        },
         rule:{
             put: function(){},
             delete: function(){},

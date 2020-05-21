@@ -7,16 +7,16 @@
             </tr>
             <tr id="form">
                 <th><input name="name" type="text" required></th>
-                <th><input name="url" type="url" class="main_field" required></th>
-                <th><input type="button" id="add" class="add" value="添加"></th>
+                <th class="main_field"><input name="url" type="url" required></th>
+                <th><input type="button" id="add" class="add" value="&plus;"></th>
             </tr>
         </thead>
         <tbody id="sites">
             <!-- {{#sites}} -->
             <tr id="{{id}}">
                 <td><input name="name" type="text" value="{{name}}" required readonly></td>
-                <td><input name="url" type="url" value="{{url}}" class="main_field" required readonly></td>
-                <td><input type="button" class="delete" class="delete" value="删除"></td>
+                <td class="main_field"><input name="url" type="url" value="{{url}}" required readonly></td>
+                <td><input type="button" class="delete" class="delete" value="&times;"><span class="move-handler">&#8645;</span></td>
             </tr>
             <!-- {{/sites}} -->
         </tbody>
@@ -42,14 +42,21 @@
         };
         var inputSelector = 'input[type="text"],input[type="url"]';
         var edit = function(target) {
-            if (target.disabled) return;
-            $(target).closest('tr').find('input').not(target).attr('disabled', true);
+            var tr = $(target).closest('tr');
+            tr.addClass('editting');
+            tr.find('input').not(target).attr('disabled', true);
             target.readOnly = undefined;
             target.focus();
         };
         $('#sites').on('click', inputSelector, e => {
             var target = e.target;
+            if (target.disabled || !target.readOnly) return;
             edit(target);
+        }).on('mousedown', 'td', e => {
+            var target = e.target;
+            if (target.tagName != 'INPUT' || target.disabled) {
+                $('#sites input:focus').blur();
+            }
         }).on('change', inputSelector, e => {
             var target = e.target;
             var tr = $(target).closest('tr');
@@ -82,15 +89,27 @@
             var target = e.target;
             if (target.classList.contains('invalid')) {
                 setTimeout(() => {
-                    edit(target);
-                },0);
+                    target.focus();
+                }, 0);
                 return;
-            }            
+            }
             var tr = $(target).closest('tr');
-            var row = tr.find('input');
+            tr.removeClass('editting');
             target.readOnly = true;
-            row.removeAttr('disabled');
+            tr.find('input').removeAttr('disabled');
+        }).sortable({
+            axis: 'y',
+            cancel: 'tr.editting *',
+            distance: 10,
+            stop: function(e,u) {
+                var urls = [];
+                $('#sites tr').each((i,e)=>{
+                    urls.push(id2url(e.id));
+                });
+                sortSite(urls);
+            }
         });
+
         $('#form').on('blur', inputSelector, e => {
             e.target.classList.remove('invalid');
         });

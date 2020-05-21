@@ -1,7 +1,8 @@
 <input hidden id="input_file" type="file" accept="application/json">
 <a hidden id="download" href="#" target="_blank" download="halowiki_backup.json">下载</a>
-<button id="export">备份</button><button id="import">恢复</button>
-
+<div class="toolbar">
+<button class="first" id="export">备份</button><button class="last" id="import">恢复</button>
+</div>
 <script>
     (function(){
         console.log('io.html');
