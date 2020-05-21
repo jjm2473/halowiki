@@ -2,8 +2,8 @@
 (function() {
     var defaultOptions = {
         sites:[
-            {name:"维基百科中文镜像",url:"https://zh.wikipedia.wikimirror.org/w/"},
-            {name:"维基百科中文镜像2",url:"https://g0.nuaa.cf/extdomains/zh.wikipedia.org/w/"},
+            {name:"维基百科镜像",url:"https://zh.wikipedia.wikimirror.org/w/"},
+            {name:"维基百科镜像2",url:"https://g0.nuaa.cf/extdomains/zh.wikipedia.org/w/"},
             {name:"维基百科中文",url:"https://zh.wikipedia.org/w/"},
             {name:"萌娘百科",url:"https://zh.moegirl.org/"},
             {name:"一把刀",url:"https://cn.18dao.net/"},
@@ -15,7 +15,7 @@
             {name:"wiki-site测试",url:"http://jjm2473.wiki-site.com/"},
             {name:"EditThis测试",url:"https://editthis.info/jjm2473/"}
         ],
-        rules: [],
+        rules: [{condition:'*.bilibili.com', target:'https://zh.moegirl.org/'}],
         defaultSite: 'https://zh.wikipedia.wikimirror.org/w/'
     };
     var check = ['sites', 'rules', 'defaultSite'];
