@@ -27,7 +27,10 @@
         console.log('sites.html');
         var options = {
             idField:'url',
-
+            add: (site, cb) => addSite(site, ()=>{cb({sites:[site]})}),
+            delete: removeSite,
+            update: updateSite,
+            sort: sortSite
         };
         var url2id = function(url) {
             return 'uid-' + btoa(escape(url)).replace(/\=/g, '').replace(/\//, '_').replace(/\+/, '-');
@@ -85,7 +88,7 @@
                 target.classList.remove('invalid');
                 var oldUrl = id2url(oldId);
                 var site = row.form();
-                updateSite(oldUrl, site);
+                options.update(oldUrl, site);
             } else {
                 target.classList.add('invalid');
             }
@@ -110,7 +113,7 @@
                 $('#sites tr').each((i,e)=>{
                     urls.push(id2url(e.id));
                 });
-                sortSite(urls);
+                options.sort(urls);
             }
         });
 
@@ -124,7 +127,7 @@
             var tr = $(target).closest('tr');
             var url = id2url(tr.get(0).id);
             tr.remove();
-            removeSite(url);
+            options.delete(url);
         });
         getConfig(
             config => {
@@ -160,9 +163,9 @@
                             e.focus();
                             e.reportValidity();
                         } else {
-                            addSite(site, () => {
+                            options.add(site, (cfg) => {
                                 row.val('');
-                                $('#sites').prepend(Mustache.render(siteTemplate, {sites:[$.extend(site, {id})]}));
+                                $('#sites').prepend(Mustache.render(siteTemplate, $.extend(cfg, {id})));
                             });
                         }
                     }
