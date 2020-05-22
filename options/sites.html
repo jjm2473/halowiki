@@ -6,8 +6,8 @@
                 <th style="width: 180px;">名称</th><th>URL</th><th style="width: 1px;"><input type="button" id="save" value="保存" style="display: none;"></th>
             </tr>
             <tr id="form">
-                <th><input name="name" type="text" required></th>
-                <th class="main_field"><input name="url" type="url" required></th>
+                <th><input name="name" type="text"></th>
+                <th class="main_field"><input name="url" type="url"></th>
                 <th><input type="button" id="add" class="add" value="&plus;"></th>
             </tr>
         </thead>
@@ -25,6 +25,10 @@
 <script>
     (function(){
         console.log('sites.html');
+        var options = {
+            idField:'url',
+
+        };
         var url2id = function(url) {
             return 'site-' + btoa(encodeURIComponent(url)).replace(/\=/g, '').replace(/\//, '_').replace(/\+/, '-');
         };
@@ -34,7 +38,7 @@
         var urlDuplicated = function(id, ignore) {
             var existed = $('#'+id).not(ignore);
             if (existed.length > 0) {
-                var e = existed.find('[name="url"]').get(0);
+                var e = existed.find('[name="'+options.idField+'"]').get(0);
                 e.classList.add('blink');
                 setTimeout(()=>{e.classList.remove('blink');}, 1250);
                 return true;
@@ -44,7 +48,7 @@
         var edit = function(target) {
             var tr = $(target).closest('tr');
             tr.addClass('editting');
-            tr.find('input').not(target).attr('disabled', true);
+            tr.find('input,select').not(target).attr('disabled', true);
             target.readOnly = undefined;
             target.focus();
         };
@@ -60,7 +64,7 @@
         }).on('change', inputSelector, e => {
             var target = e.target;
             var tr = $(target).closest('tr');
-            var row = tr.find('input');
+            var row = tr.find('input,select');
             var validate = true;
             row.each((i,e)=>{
                 if (!e.checkValidity()) {
@@ -69,7 +73,7 @@
                 }
             });
             var oldId = tr.get(0).id;
-            if (validate && target.name == 'url') {
+            if (validate && target.name == options.idField) {
                 var id = url2id(target.value);
                 if (urlDuplicated(id, tr)) {
                     validate = false;
@@ -96,7 +100,7 @@
             var tr = $(target).closest('tr');
             tr.removeClass('editting');
             target.readOnly = true;
-            tr.find('input').removeAttr('disabled');
+            tr.find('input,select').removeAttr('disabled');
         }).sortable({
             axis: 'y',
             cancel: 'tr.editting *',
@@ -112,6 +116,8 @@
 
         $('#form').on('blur', inputSelector, e => {
             e.target.classList.remove('invalid');
+            e.target.setCustomValidity('');
+            e.target.checkValidity();
         });
         $('#sites').on('click', '.delete', e => {
             var target = e.target;
@@ -123,17 +129,19 @@
         getConfig(
             config => {
                 var siteTemplate = $('#sites').html();
-                config.sites.forEach(site => {
-                    site.id = url2id(site.url);
-                });
+                config.id = function(){return url2id(this[options.idField]);};
                 var list = Mustache.render(siteTemplate, config);
                 $('#sites').html(list);
                 $('#add').on('click', e => {
                     var target = e.target;
-                    var row = $(target).closest('tr').find('input').not(target);
+                    var row = $(target).closest('tr').find('input,select').not(target);
                     var validate = true;
                     row.each((i,e)=>{
-                        if (!e.checkValidity()) {
+                        e.setCustomValidity('');
+                        if (e.value === '') {
+                            e.setCustomValidity('请填写此字段。');
+                        }
+                        if (!e.reportValidity()) {
                             e.classList.add('invalid');
                             e.focus();
                             validate = false;
@@ -144,11 +152,13 @@
                     });
                     if (validate) {
                         var site = row.form();
-                        var id = url2id(site.url);
+                        var id = url2id(site[options.idField]);
                         if (urlDuplicated(id)) {
-                            var e = row.filter('[name="url"]').get(0);
+                            var e = row.filter('[name="' + options.idField + '"]').get(0);
                             e.classList.add('invalid');
+                            e.setCustomValidity('已存在');
                             e.focus();
+                            e.reportValidity();
                         } else {
                             addSite(site, () => {
                                 row.val('');
@@ -158,7 +168,7 @@
                     }
                 });
                 $('#save').on('click', e => {
-                    var sites = $('#sites tr').map((i,e)=>$(e).find('input').form()).get();
+                    var sites = $('#sites tr').map((i,e)=>$(e).find('input,select').form()).get();
                     rpc({
                         url: 'api/config',
                         method: 'post',
