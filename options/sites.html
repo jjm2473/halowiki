@@ -30,10 +30,10 @@
 
         };
         var url2id = function(url) {
-            return 'site-' + btoa(encodeURIComponent(url)).replace(/\=/g, '').replace(/\//, '_').replace(/\+/, '-');
+            return 'uid-' + btoa(escape(url)).replace(/\=/g, '').replace(/\//, '_').replace(/\+/, '-');
         };
         var id2url = function(id) {
-            return decodeURIComponent(atob(id.substring(5).replace(/\-/g, '+').replace(/\_/, '/')));
+            return unescape(atob(id.substring(4).replace(/\-/g, '+').replace(/\_/, '/')));
         };
         var urlDuplicated = function(id, ignore) {
             var existed = $('#'+id).not(ignore);
