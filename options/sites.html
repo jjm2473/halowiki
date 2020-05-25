@@ -3,7 +3,7 @@
     <table style="width: 100%;">
         <thead>
             <tr>
-                <th style="width: 180px;">名称</th><th>URL</th><th style="width: 1px;"><input type="button" id="save" value="保存" style="display: none;"></th>
+                <th style="width: 180px;">名称</th><th>URL</th><th style="width: 1px;"></th>
             </tr>
             <tr id="form">
                 <th><input name="name" type="text"></th>
@@ -30,7 +30,13 @@
             add: (site, cb) => addSite(site, ()=>{cb({sites:[site]})}),
             delete: removeSite,
             update: updateSite,
-            sort: sortSite
+            sort: sortSite,
+            validate: (name, value)=>''
+        };
+        var validator = (ele) => {
+            var err = options.validate(ele.name, ele.value);
+            ele.setCustomValidity(err);
+            return err==='';
         };
         var url2id = function(url) {
             return 'uid-' + btoa(escape(url)).replace(/\=/g, '').replace(/\//, '_').replace(/\+/, '-');
@@ -64,21 +70,17 @@
             if (target.tagName != 'INPUT' || target.disabled) {
                 $('#sites input:focus').blur();
             }
-        }).on('change', inputSelector, e => {
+        }).on('change', inputSelector+',select', e => {
             var target = e.target;
             var tr = $(target).closest('tr');
-            var row = tr.find('input,select');
-            var validate = true;
-            row.each((i,e)=>{
-                if (!e.checkValidity()) {
-                    validate = false;
-                    return false;
-                }
-            });
+
+            target.setCustomValidity('');
+            var validate = target.checkValidity() && validator(target);
             var oldId = tr.get(0).id;
             if (validate && target.name == options.idField) {
                 var id = url2id(target.value);
                 if (urlDuplicated(id, tr)) {
+                    target.setCustomValidity('重复了');
                     validate = false;
                 } else {
                     tr.get(0).id = id;
@@ -87,9 +89,11 @@
             if (validate) {
                 target.classList.remove('invalid');
                 var oldUrl = id2url(oldId);
+                var row = tr.find('input,select').not('input[type="button"]');
                 var site = row.form();
                 options.update(oldUrl, site);
             } else {
+                target.checkValidity();
                 target.classList.add('invalid');
             }
         }).on('blur', inputSelector, e => {
@@ -143,6 +147,8 @@
                         e.setCustomValidity('');
                         if (e.value === '') {
                             e.setCustomValidity('请填写此字段。');
+                        } else {
+                            validator(e);
                         }
                         if (!e.reportValidity()) {
                             e.classList.add('invalid');
@@ -165,21 +171,10 @@
                         } else {
                             options.add(site, (cfg) => {
                                 row.val('');
-                                $('#sites').prepend(Mustache.render(siteTemplate, $.extend(cfg, {id})));
+                                $('#sites').prepend(Mustache.render(siteTemplate, $.extend($.extend(config, cfg), {id})));
                             });
                         }
                     }
-                });
-                $('#save').on('click', e => {
-                    var sites = $('#sites tr').map((i,e)=>$(e).find('input,select').form()).get();
-                    rpc({
-                        url: 'api/config',
-                        method: 'post',
-                        data: {sites},
-                        error: e => {
-                            console.error('update sites', e);
-                        }
-                    });
                 });
             }
         );
